@@ -4,7 +4,9 @@ import pygame
 import sys
 pygame.init()
 
-# !!! Разные типы ячеек - как классы с наследованием  ( сделано в другой проге )
+# @todo Выяснить что такое loop
+# @todo Разобраться с корректным перезапуском программы (сворачиванием)
+# @todo Разные типы ячеек - как классы с наследованием
 
 def main_game_loop():
     SIDE = 64
@@ -100,7 +102,7 @@ def main_game_loop():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+
             elif event.type == pygame.MOUSEMOTION:
                 mouse_X, mouse_Y = event.pos
             
