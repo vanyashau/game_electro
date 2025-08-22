@@ -1,7 +1,6 @@
 import copy
 import random
 import pygame
-import sys
 pygame.init()
 
 # loop -> с англ. 'петля', в контексте программы
@@ -35,22 +34,61 @@ class Cell:
         return self.rotation == self.win_pos
 
     def draw(self, surface, x, y, side, all_active):
-        img = self.get_image(all_active)
-        img = pygame.transform.scale(img, (side, side))
-        surface.blit(img, (x * side, y * side))
+        imagine = self.get_image(all_active)
+        imagine = pygame.transform.scale(imagine, (side, side))
+        surface.blit(imagine, (x * side, y * side))
 
-    def rotate_img(img, rotation):
+    def rotate_img(imagine, rotation):
         if rotation == 2:
-            return pygame.transform.rotate(img, -90)
+            return pygame.transform.rotate(imagine, -90)
         elif rotation == 3:
-            return pygame.transform.rotate(img, 180)
+            return pygame.transform.rotate(imagine, 180)
         elif rotation == 4:
-            return pygame.transform.rotate(img, 90)
-        return img
+            return pygame.transform.rotate(imagine, 90)
+        return imagine
     def get_image(self, all_active=False):
         return pygame.image.load('items/empty.png')
 
+class EmptyCell(Cell):
+    def get_image(self, all_active=False):
+        return pygame.image.load('items/empty.png')
 
+class BatteryCell(Cell):
+    def get_image(self, all_active=False):
+        imagine = pygame.image.load('items/battery.png')
+        if all_active:
+            imagine = pygame.image.load('items/battery_active.png')
+        return Cell.rotate_imagine(imagine, self.rotation)
+
+class LightCell(Cell):
+    def get_image(self, all_active=False):
+        imagine = pygame.image.load('items/light.png')
+        if all_active:
+            imagine = pygame.image.load('items/light_active.png')
+        return Cell.rotate_imagine(imagine, self.rotation)
+
+class StraightCell(Cell):
+    def get_image(self, all_active=False):
+        imagine = pygame.image.load('items/straight.png')
+        if all_active:
+            imagine = pygame.image.load('items/straight_active.png')
+        if self.rotation == 2:
+            imagine = pygame.transform.rotate(imagine, -90)
+        return imagine
+
+class CornerCell(Cell):
+    def get_image(self, all_active=False):
+        imagine = pygame.image.load('items/corner.png')
+        if all_active:
+            imagine = pygame.image.load('items/corner_active.png')
+        return Cell.rotate_imagine(imagine, self.rotation)
+
+class CrossCell(Cell):
+    def get_image(self, all_active=False):
+        imagine = pygame.image.load('items/cross.png')
+        if all_active:
+            imagine = pygame.image.load('items/cross_active.png')
+        return imagine
 
 # def main_game_loop():
 #     SIDE = 64
