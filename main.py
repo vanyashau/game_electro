@@ -20,11 +20,16 @@ class Cell:
         self.win_pos = win_pos
 
     def can_rotate(self):
-        return self.frozen != 2 and self.cell_type != 1
+        if self.frozen != 2 and self.cell_type != 1 and self.cell_type != 6:
+            return True
+        else:
+            return False
 
     def rotate(self):
-        if self.can_rotate():
+        if self.can_rotate() and self.cell_type != 4:
             self.rotation = self.rotation % 4 + 1
+        elif self.can_rotate() and self.cell_type == 4:
+            self.rotation = self. rotation % 2 + 1
 
     def is_win(self):
         return self.rotation == self.win_pos
@@ -42,7 +47,6 @@ class Cell:
         elif rotation == 4:
             return pygame.transform.rotate(img, 90)
         return img
-    
     def get_image(self, all_active=False):
         return pygame.image.load('items/empty.png')
 
