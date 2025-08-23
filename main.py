@@ -9,7 +9,7 @@ pygame.init()
 # TODO Разобраться с корректным перезапуском программы (сворачиванием)
 # TODO Разные типы ячеек - как классы с наследованием
 
-SIDE = 64
+side = 64
 
 class Cell:
     def __init__(self, cell_type, rotation, frozen, win_pos):
@@ -128,6 +128,31 @@ def win_inspector(matrix):
                 if not cell.is_win():
                     return False
     return True
+
+def main_game_loop():
+    global side
+    lvl = random.randint(1, 10)
+    file_path = f'уровни/lvl-{lvl}.txt'
+    matrix = matrix_reader(file_path)
+
+    W = len(matrix[0]) * side
+    H = len(matrix) * side
+    sc = pygame.display.set_mode((W, H), pygame.RESIZABLE)
+    pygame.display.set_caption(f'GameElectro - level {lvl}')
+    pygame.display.set_icon(pygame.image.load('items/light_active.png'))
+
+    def field_drawer(all_active=False):
+        for y, row in enumerate(matrix):
+            for x, cell in enumerate(row):
+                if cell.cell_type == 1 or cell.frozen == 2:
+                    img = pygame.image.load('items/empty.png')
+                else:
+                    img = pygame.image.load('items/filled.png')
+                img = pygame.transform.scale(img, (side, side))
+                sc.blit(img, (side * x, side * y))
+                if cell.cell_type != 1:
+                    cell.draw(sc, x, y, side, all_active)
+        pygame.display.update()
 
 # def main_game_loop():
 #     SIDE = 64
