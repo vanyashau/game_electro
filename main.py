@@ -1,4 +1,4 @@
-import copy
+import copy 
 import random
 import pygame
 pygame.init()
@@ -38,7 +38,7 @@ class Cell:
         imagine = pygame.transform.scale(imagine, (side, side))
         surface.blit(imagine, (x * side, y * side))
 
-    def rotate_img(imagine, rotation):
+    def rotate_imagine(imagine, rotation):
         if rotation == 2:
             return pygame.transform.rotate(imagine, -90)
         elif rotation == 3:
@@ -90,7 +90,7 @@ class CrossCell(Cell):
         if all_active:
             imagine = pygame.image.load('items/cross_active.png')
         else:
-            imagine = pygame.image.load('items/cross_active.png')
+            imagine = pygame.image.load('items/cross.png')
         return imagine
 
 def cell_creator(cell_type, rotation, frozen, win):
@@ -145,15 +145,76 @@ def main_game_loop():
         for y, row in enumerate(matrix):
             for x, cell in enumerate(row):
                 if cell.cell_type == 1 or cell.frozen == 2:
-                    img = pygame.image.load('items/empty.png')
+                    imagine = pygame.image.load('items/empty.png')
                 else:
-                    img = pygame.image.load('items/filled.png')
-                img = pygame.transform.scale(img, (side, side))
-                sc.blit(img, (side * x, side * y))
+                    imagine = pygame.image.load('items/filled.png')
+                imagine = pygame.transform.scale(imagine, (side, side))
+                sc.blit(imagine, (side * x, side * y))
                 if cell.cell_type != 1:
                     cell.draw(sc, x, y, side, all_active)
         pygame.display.update()
 
+    field_drawer()
+    FPS = 10
+    clock = pygame.time.Clock()
+    game_won = False
+    mouse_X, mouse_Y = 0, 0
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEMOTION:
+                mouse_X, mouse_Y = event.pos
+            elif event.type == pygame.VIDEORESIZE:
+                new_width, new_height = event.size
+                cell_size_x = new_width // len(matrix[0])
+                cell_size_y = new_height // len(matrix)
+                side = max(min(cell_size_x, cell_size_y), 50)
+                W = len(matrix[0]) * side
+                H = len(matrix) * side
+                sc = pygame.display.set_mode((W, H), pygame.RESIZABLE)
+                field_drawer(game_won)
+                if game_won:
+                    restart_imagine = pygame.image.load('items/перезапуск.png')
+                    restart_imagine = pygame.transform.scale(restart_imagine, (side*2, side*2))
+                    x_corner = (W - side*2) // 2
+                    y_corner = (H - side*2) // 2
+                    sc.blit(restart_imagine, (x_corner, y_corner))
+                    pygame.display.flip()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if not game_won and event.button == 1:
+                    X_quad = int(mouse_X) // side
+                    Y_quad = int(mouse_Y) // side
+                    if 0 <= Y_quad < len(matrix) and 0 <= X_quad < len(matrix[0]):
+                        cell = matrix[Y_quad][X_quad]
+                        if cell.can_rotate():
+                            cell.rotate()
+                            game_won = win_inspector(matrix)
+                            field_drawer(game_won)
+                            if game_won:
+                                restart_imagine = pygame.image.load('items/перезапуск.png')
+                                restart_imagine = pygame.transform.scale(restart_imagine, (side*2, side*2))
+                                x_corner = (W - side*2) // 2
+                                y_corner = (H - side*2) // 2
+                                sc.blit(restart_imagine, (x_corner, y_corner))
+                                pygame.display.flip()
+                elif game_won and event.button == 1:
+                    btn_size = side * 2
+                    x_corner = (W - btn_size) // 2
+                    y_corner = (H - btn_size) // 2
+                    if (x_corner <= mouse_X <= x_corner + btn_size and
+                        y_corner <= mouse_Y <= y_corner + btn_size):
+                        return True
+        clock.tick(FPS)
+    return False
+
+while True:
+    should_restart = main_game_loop()
+    if not should_restart:
+        break
+
+        
 # def main_game_loop():
 #     SIDE = 64
 #     def load_scaled_image(path, size):
