@@ -46,8 +46,6 @@ class Cell:
         elif rotation == 4:
             return pygame.transform.rotate(imagine, 90)
         return imagine
-    def get_image(self, all_active=False):
-        return pygame.image.load('items/empty.png')
 
 class EmptyCell(Cell):
     def get_image(self, all_active=False):
@@ -55,40 +53,81 @@ class EmptyCell(Cell):
 
 class BatteryCell(Cell):
     def get_image(self, all_active=False):
-        imagine = pygame.image.load('items/battery.png')
         if all_active:
             imagine = pygame.image.load('items/battery_active.png')
+        else:
+            imagine = pygame.image.load('items/battery.png')
         return Cell.rotate_imagine(imagine, self.rotation)
 
 class LightCell(Cell):
     def get_image(self, all_active=False):
-        imagine = pygame.image.load('items/light.png')
         if all_active:
             imagine = pygame.image.load('items/light_active.png')
+        else:
+            imagine = pygame.image.load('items/light.png')
         return Cell.rotate_imagine(imagine, self.rotation)
 
 class StraightCell(Cell):
     def get_image(self, all_active=False):
-        imagine = pygame.image.load('items/straight.png')
         if all_active:
             imagine = pygame.image.load('items/straight_active.png')
+        else:
+            imagine = pygame.image.load('items/straight.png')
         if self.rotation == 2:
             imagine = pygame.transform.rotate(imagine, -90)
         return imagine
 
 class CornerCell(Cell):
     def get_image(self, all_active=False):
-        imagine = pygame.image.load('items/corner.png')
         if all_active:
             imagine = pygame.image.load('items/corner_active.png')
+        else:
+            imagine = pygame.image.load('items/corner.png')
         return Cell.rotate_imagine(imagine, self.rotation)
 
 class CrossCell(Cell):
     def get_image(self, all_active=False):
-        imagine = pygame.image.load('items/cross.png')
         if all_active:
             imagine = pygame.image.load('items/cross_active.png')
+        else:
+            imagine = pygame.image.load('items/cross_active.png')
         return imagine
+
+def cell_creator(cell_type, rotation, frozen, win):
+    if cell_type == 1:
+        return EmptyCell(cell_type, rotation, frozen, win)
+    elif cell_type == 2:
+        return BatteryCell(cell_type, rotation, frozen, win)
+    elif cell_type == 3:
+        return LightCell(cell_type, rotation, frozen, win)
+    elif cell_type == 4:
+        return StraightCell(cell_type, rotation, frozen, win)
+    elif cell_type == 5:
+        return CornerCell(cell_type, rotation, frozen, win)
+    elif cell_type == 6:
+        return CrossCell(cell_type, rotation, frozen, win)
+
+def matrix_reader(file_path):
+    matrix = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            row = []
+            for cell_str in line.strip().split():
+                cell_type = int(cell_str[0])
+                rotation = int(cell_str[1])
+                frozen = int(cell_str[2])
+                win = int(cell_str[3])
+                row.append(cell_creator(cell_type, rotation, frozen, win))
+            matrix.append(row)
+    return matrix
+
+def win_inspector(matrix):
+    for row in matrix:
+        for cell in row:
+            if cell.cell_type != 1 and cell.cell_type !=6 and cell.frozen != 2:
+                if not cell.is_win():
+                    return False
+    return True
 
 # def main_game_loop():
 #     SIDE = 64
