@@ -3,11 +3,11 @@ import random
 import pygame
 pygame.init()
 
-# loop -> с англ. 'петля', в контексте программы
-# обозначает основной код в виде функции, который как бы идет по петле
+# Узнать что такое loop()
+#   loop -> с англ. 'петля', в контексте программы
+#   обозначает основной код в виде функции, который как бы идет по петле
 
-# TODO Разобраться с корректным перезапуском программы (сворачиванием)
-# TODO Разные типы ячеек - как классы с наследованием
+all_lvls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 side = 64
 
@@ -129,10 +129,16 @@ def win_inspector(matrix):
                     return False
     return True
 
-def main_game_loop():
+def next_lvl(lvls):
+    if not lvls:
+        lvls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    lvl = random.choice(lvls)
+    lvls.remove(lvl)
+    return lvl, lvls
+
+def main_game_loop(file_path):
     global side
-    lvl = random.randint(1, 10)
-    file_path = f'уровни/lvl-{lvl}.txt'
+    
     matrix = matrix_reader(file_path)
 
     W = len(matrix[0]) * side
@@ -209,12 +215,15 @@ def main_game_loop():
         clock.tick(FPS)
     return False
 
+lvls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
 while True:
-    should_restart = main_game_loop()
+    lvl, lvls = next_lvl(lvls)
+    file_path = f'уровни/lvl-{lvl}.txt'
+    should_restart = main_game_loop(file_path)
     if not should_restart:
         break
 
-        
 # def main_game_loop():
 #     SIDE = 64
 #     def load_scaled_image(path, size):
