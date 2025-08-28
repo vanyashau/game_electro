@@ -8,6 +8,13 @@ pygame.init()
 #   обозначает основной код в виде функции, который как бы идет по петле
 
 class Cell:
+    TYPE_EMPTY = 1
+    TYPE_BATTERY = 2
+    TYPE_LIGHT = 3
+    TYPE_STRAIGHT = 4
+    TYPE_CORNER = 5
+    TYPE_CROSS = 6
+
     def __init__(self, cell_type, rotation, frozen, win_pos):
         self.cell_type = cell_type
         self.rotation = rotation
@@ -15,15 +22,15 @@ class Cell:
         self.win_pos = win_pos
 
     def can_rotate(self):
-        if self.frozen != 2 and self.cell_type != 1 and self.cell_type != 6:
+        if not self.frozen and self.cell_type != Cell.TYPE_EMPTY and self.cell_type != Cell.TYPE_CROSS:
             return True
         else:
             return False
 
     def rotate(self):
-        if self.can_rotate() and self.cell_type != 4:
+        if self.can_rotate() and self.cell_type != Cell.TYPE_STRAIGHT:
             self.rotation = self.rotation % 4 + 1
-        elif self.can_rotate() and self.cell_type == 4:
+        elif self.can_rotate() and self.cell_type == Cell.TYPE_STRAIGHT:
             self.rotation = self. rotation % 2 + 1
 
     def is_win(self):
@@ -90,17 +97,17 @@ class CrossCell(Cell):
         return image
 
 def create_cell(cell_type, rotation, frozen, win):
-    if cell_type == 1:
+    if cell_type == Cell.TYPE_EMPTY:
         return EmptyCell(cell_type, rotation, frozen, win)
-    elif cell_type == 2:
+    elif cell_type == Cell.TYPE_BATTERY:
         return BatteryCell(cell_type, rotation, frozen, win)
-    elif cell_type == 3:
+    elif cell_type == Cell.TYPE_LIGHT:
         return LightCell(cell_type, rotation, frozen, win)
-    elif cell_type == 4:
+    elif cell_type == Cell.TYPE_STRAIGHT:
         return StraightCell(cell_type, rotation, frozen, win)
-    elif cell_type == 5:
+    elif cell_type == Cell.TYPE_CORNER:
         return CornerCell(cell_type, rotation, frozen, win)
-    elif cell_type == 6:
+    elif cell_type == Cell.TYPE_CROSS:
         return CrossCell(cell_type, rotation, frozen, win)
 
 def read_matrix(file_path):
@@ -111,16 +118,16 @@ def read_matrix(file_path):
             for cell_str in line.split():
                 cell_type = int(cell_str[0])
                 rotation = int(cell_str[1])
-                frozen = int(cell_str[2])
+                frozen = int(cell_str[2]) == 2
                 win = int(cell_str[3])
                 row.append(create_cell(cell_type, rotation, frozen, win))
             matrix.append(row)
     return matrix
 
-def inspect_win(matrix):
+def check_win(matrix):
     for row in matrix:
         for cell in row:
-            if cell.cell_type != 1 and cell.cell_type !=6 and cell.frozen != 2:
+            if cell.cell_type != 1 and cell.cell_type !=6 and not cell.frozen:
                 if not cell.is_win():
                     return False
     return True
@@ -135,7 +142,7 @@ def choice_next_lvl(lvls):
 def draw_field(scene, matrix, side, all_active=False):
     for y, row in enumerate(matrix):
         for x, cell in enumerate(row):
-            if cell.cell_type == 1 or cell.frozen == 2:
+            if cell.cell_type == 1 or cell.frozen:
                 image = pygame.image.load('items/empty.png')
             else:
                 image = pygame.image.load('items/filled.png')
@@ -191,7 +198,7 @@ def main_game_loop(file_path, side):
                         cell = matrix[Y_quad][X_quad]
                         if cell.can_rotate():
                             cell.rotate()
-                            game_won = inspect_win(matrix)
+                            game_won = check_win(matrix)
                             draw_field(sc, matrix, side, game_won)
                             if game_won:
                                 restart_image = pygame.image.load('items/перезапуск.png')
