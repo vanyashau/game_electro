@@ -7,8 +7,6 @@ pygame.init()
 #   loop -> с англ. 'петля', в контексте программы
 #   обозначает основной код в виде функции, который как бы идет по петле
 
-side = 64
-
 class Cell:
     def __init__(self, cell_type, rotation, frozen, win_pos):
         self.cell_type = cell_type
@@ -105,12 +103,12 @@ def create_cell(cell_type, rotation, frozen, win):
     elif cell_type == 6:
         return CrossCell(cell_type, rotation, frozen, win)
 
-def read_matrix_from_txt(file_path):
+def read_matrix(file_path):
     matrix = []
     with open(file_path, 'r') as file:
         for line in file:
             row = []
-            for cell_str in line.strip().split():
+            for cell_str in line.split():
                 cell_type = int(cell_str[0])
                 rotation = int(cell_str[1])
                 frozen = int(cell_str[2])
@@ -149,7 +147,7 @@ def draw_field(scene, matrix, side, all_active=False):
 
 
 def main_game_loop(file_path, side):
-    matrix = read_matrix_from_txt(file_path)
+    matrix = read_matrix(file_path)
 
     W = len(matrix[0]) * side
     H = len(matrix) * side
@@ -213,6 +211,7 @@ def main_game_loop(file_path, side):
     return False, side
 
 lvls = list(range(1, 11))
+side = 64
 
 while True:
     lvl, lvls = choice_next_lvl(lvls)
